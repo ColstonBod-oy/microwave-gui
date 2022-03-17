@@ -47,9 +47,9 @@ public class MicrowaveGUI {
         }
         
         controlsPanel.add(new SciButton(Integer.toString(0), font, textField, isTimerRunning));
-        SciButton start = new SciButton("start", font, textField, isTimerRunning);
+        SciButton start = new SciButton("start", font, textField, controlsPanel, isTimerRunning);
         controlsPanel.add(start);
-        controlsPanel.add(new SciButton("stop", font, textField, start.getTimer(), isTimerRunning));
+        controlsPanel.add(new SciButton("stop", font, textField, controlsPanel, start.getTimer(), isTimerRunning));
         
         JPanel mainPanel = new JPanel();
         mainPanel.setLayout(new BorderLayout());

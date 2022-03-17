@@ -19,6 +19,7 @@ import java.awt.event.MouseListener;
 import java.text.DecimalFormat;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JPanel;
 import javax.swing.Timer;
 import javax.swing.border.AbstractBorder;
 import javax.swing.border.EmptyBorder;
@@ -36,6 +37,7 @@ public class SciButton extends JButton {
     private String ddMinutes;
     private String ddSeconds;
     private DecimalFormat dFormat;
+    private Component[] buttons;
     private Timer timer;
     
     public SciButton(String text, Font font, SciTextField textField, boolean[] isTimerRunning) {
@@ -45,6 +47,57 @@ public class SciButton extends JButton {
         setBackground(Color.decode("#08deea"));
         setForeground(Color.decode("#01012b"));
         setBorder(BorderFactory.createCompoundBorder(new SciButton.VeryRoundedBorder(), new EmptyBorder(new Insets(25, 25, 25, 25))));
+        
+        addMouseListener(new MouseListener() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (isEnabled() && textField != null && !getText().equals("start") && !getText().equals("stop")) {
+                    if (textField.getText().equals(textField.getInitText())) {
+                        textField.setText(text);
+                        textField.setForeground(Color.decode("#08deea"));
+                    }
+                    
+                    else {
+                        textField.setText(textField.getText() + text);
+                    }
+                }
+            }
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+                if (isEnabled()) {
+                    setContentAreaFilled(false);
+                    setOpaque(true);
+                    setBackground(Color.decode("#08deea"));
+                }
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                if (isEnabled()) {
+                    setContentAreaFilled(true);
+                    setBackground(Color.decode("#00fefc"));
+                }
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                if (isEnabled()) {
+                    setBackground(Color.decode("#00fefc"));
+                }
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                if (isEnabled()) {
+                    setBackground(Color.decode("#08deea"));
+                }
+            }
+        });
+    }
+    
+    public SciButton(String text, Font font, SciTextField textField, JPanel controlsPanel, boolean[] isTimerRunning) {
+        this(text, font, textField, isTimerRunning);
         
         if (text.equals("start")) {
             dFormat = new DecimalFormat("00");
@@ -80,6 +133,11 @@ public class SciButton extends JButton {
                         textField.setText(textField.getInitText());
                         timer.stop();
                         isTimerRunning[0] = false;
+                        buttons = controlsPanel.getComponents();
+                    
+                        for (int i = 0; i < 10; i++) {
+                            buttons[i].setEnabled(true);
+                        }
                     }
                 }
             });
@@ -88,55 +146,48 @@ public class SciButton extends JButton {
         addMouseListener(new MouseListener() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                if (textField != null && !getText().equals("start") && !getText().equals("stop")) {
-                    if (textField.getText().equals(textField.getInitText())) {
-                        textField.setText(text);
-                        textField.setForeground(Color.decode("#08deea"));
+                if (getText().equals("start") &&
+                        !textField.getText().equals(textField.getInitText()) &&
+                        !isTimerRunning[0]
+                    ) {
+                    if (Integer.parseInt(textField.getText()) == 0) {
+                        textField.setText(textField.getInitText());
+                        textField.setForeground(Color.decode("#ff160c"));
                     }
                     
                     else {
-                        textField.setText(textField.getText() + text);
+                        hours = Integer.parseInt(textField.getText()) / 60;
+                        minutes = Integer.parseInt(textField.getText()) % 60;
+                        seconds = 0;
+                        timer.start();
+                        isTimerRunning[0] = true;
+                        textField.setForeground(Color.decode("#ff160c"));
+                        buttons = controlsPanel.getComponents();
+                    
+                        for (int i = 0; i < 10; i++) {
+                            buttons[i].setEnabled(false);
+                        }
                     }
                 }
-                
-                else if (getText().equals("start") && 
-                        !textField.getText().equals(textField.getInitText()) && 
-                        Integer.parseInt(textField.getText()) > 0
-                    ) {
-                    hours = Integer.parseInt(textField.getText()) / 60;
-                    minutes = Integer.parseInt(textField.getText()) % 60;
-                    timer.start();
-                    isTimerRunning[0] = true;
-                    textField.setForeground(Color.decode("#ff160c"));
-                }
             }
 
             @Override
-            public void mousePressed(MouseEvent e) {
-                setContentAreaFilled(false);
-                setOpaque(true);
-                setBackground(Color.decode("#08deea"));
-            }
+            public void mousePressed(MouseEvent e) {}
 
             @Override
-            public void mouseReleased(MouseEvent e) {
-                setContentAreaFilled(true);
-                setBackground(Color.decode("#00fefc"));
-            }
+            public void mouseReleased(MouseEvent e) {}
 
             @Override
-            public void mouseEntered(MouseEvent e) {
-                setBackground(Color.decode("#00fefc"));
-            }
+            public void mouseEntered(MouseEvent e) {}
 
             @Override
-            public void mouseExited(MouseEvent e) {
-                setBackground(Color.decode("#08deea"));
-            }
+            public void mouseExited(MouseEvent e) {}
         });
     }
     
-    public SciButton(String text, Font font, SciTextField textField, Timer timer, boolean[] isTimerRunning) {
+    public SciButton(String text, Font font, SciTextField textField, JPanel controlsPanel, 
+            Timer timer, boolean[] isTimerRunning
+        ) {
         this(text, font, textField, isTimerRunning);
         
         addMouseListener(new MouseListener() {
@@ -149,31 +200,25 @@ public class SciButton extends JButton {
                     timer.stop();
                     isTimerRunning[0] = false;
                     textField.setText(textField.getInitText());
+                    buttons = controlsPanel.getComponents();
+                    
+                    for (int i = 0; i < 10; i++) {
+                        buttons[i].setEnabled(true);
+                    }
                 }
             }
 
             @Override
-            public void mousePressed(MouseEvent e) {
-                setContentAreaFilled(false);
-                setOpaque(true);
-                setBackground(Color.decode("#08deea"));
-            }
+            public void mousePressed(MouseEvent e) {}
 
             @Override
-            public void mouseReleased(MouseEvent e) {
-                setContentAreaFilled(true);
-                setBackground(Color.decode("#00fefc"));
-            }
+            public void mouseReleased(MouseEvent e) {}
 
             @Override
-            public void mouseEntered(MouseEvent e) {
-                setBackground(Color.decode("#00fefc"));
-            }
+            public void mouseEntered(MouseEvent e) {}
 
             @Override
-            public void mouseExited(MouseEvent e) {
-                setBackground(Color.decode("#08deea"));
-            }
+            public void mouseExited(MouseEvent e) {}
         });
     }
     
